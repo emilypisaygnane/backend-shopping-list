@@ -20,16 +20,10 @@ const mockUser2 = {
 
 const registerAndLogin = async (userProps = {}) => {
   const password = userProps.password ?? mockUser.password;
-
-  // Create an "agent" that gives us the ability
-  // to store cookies between requests in a test
   const agent = request.agent(app);
-
-  // Create a user to sign in with
   const user = await UserService.create({ ...mockUser, ...userProps });
-
-  // ...then sign in
   const { email } = user;
+
   await agent.post('/api/v1/users/sessions').send({ email, password });
   return [agent, user];
 };
@@ -38,9 +32,11 @@ describe('items', () => {
   beforeEach(() => {
     return setup(pool);
   });
+
   afterAll(() => {
     pool.end();
   });
+
   it('POST /api/v1/items creates a new shopping item with the current user', async () => {
     const [agent, user] = await registerAndLogin();
     const newItem = { description: 'eggs', qty: 12 };
